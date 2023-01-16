@@ -85,9 +85,10 @@ class Client:
         if limit > 0:
             params["limit"] = limit
         if starting_after is not None:
-            params["starting_after"] = str(starting_after)
+            params["starting_after"] = f"id:{str(starting_after)}"
         if email is not None:
             params["email"] = email
+        params["version"] = "2"
         j = self._get("/authn/users", params=params)
         if email is None:
             users = [UserResponse.from_json(ur) for ur in j["data"]]
