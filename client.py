@@ -10,7 +10,7 @@ import requests
 from models import (
     AccessPolicy,
     Column,
-    ColumnAccessor,
+    Accessor,
     UserProfile,
     UserResponse,
     UserSelector,
@@ -203,38 +203,38 @@ class Client:
     def DeleteTransformationPolicy(self, id: uuid.UUID):
         return self._delete(f"/tokenizer/policies/generation/{str(id)}")
 
-    # ColumnAccessor Operations
+    # Accessor Operations
 
-    def CreateAccessor(self, accessor: ColumnAccessor) -> ColumnAccessor:
+    def CreateAccessor(self, accessor: Accessor) -> Accessor:
         body = {"accessor": accessor.__dict__}
 
         j = self._post("/userstore/config/accessors", data=ucjson.dumps(body))
-        return ColumnAccessor.from_json(j.get("accessor"))
+        return Accessor.from_json(j.get("accessor"))
 
     def DeleteAccessor(self, id: uuid.UUID) -> str:
         return self._delete(f"/userstore/config/accessors/{str(id)}")
 
-    def GetAccessor(self, id: uuid.UUID) -> ColumnAccessor:
+    def GetAccessor(self, id: uuid.UUID) -> Accessor:
         j = self._get(f"/userstore/config/accessors/{str(id)}")
-        return ColumnAccessor.from_json(j.get("accessor"))
+        return Accessor.from_json(j.get("accessor"))
 
-    def ListAccessors(self) -> list[ColumnAccessor]:
+    def ListAccessors(self) -> list[Accessor]:
         j = self._get("/userstore/config/accessors")
 
         accessors = []
         for a in j:
-            accessors.append(ColumnAccessor.from_json(a))
+            accessors.append(Accessor.from_json(a))
 
         return accessors
 
-    def UpdateAccessor(self, accessor: ColumnAccessor) -> ColumnAccessor:
+    def UpdateAccessor(self, accessor: Accessor) -> Accessor:
         body = {"accessor": accessor.__dict__}
 
         j = self._put(
             f"/userstore/config/accessors/{accessor.id}",
             data=ucjson.dumps(body),
         )
-        return ColumnAccessor.from_json(j.get("accessor"))
+        return Accessor.from_json(j.get("accessor"))
 
     def ExecuteAccessor(
         self, user: UserSelector, accessor_id: uuid.UUID, context: dict

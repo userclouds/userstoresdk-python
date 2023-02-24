@@ -6,7 +6,7 @@ from client import Client, Error
 from models import (
     AccessPolicy,
     Column,
-    ColumnAccessor,
+    Accessor,
     UserProfile,
     APIErrorResponse,
     UserSelector,
@@ -95,7 +95,7 @@ function policy(data, params) {
 
     # create column accessors for security and support
     try:
-        ca_support = ColumnAccessor(
+        ca_support = Accessor(
             uuid.uuid4(),
             "PIIAccessorForSupport",
             colIds,
@@ -108,7 +108,7 @@ function policy(data, params) {
         ca_support_id = recoverIDFrom409Error(e)
 
     try:
-        ca_security = ColumnAccessor(
+        ca_security = Accessor(
             uuid.uuid4(),
             "PIIAccessorForSecurity",
             colIds,

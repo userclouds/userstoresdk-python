@@ -167,7 +167,7 @@ class Column:
         return Column(uuid.UUID(j["id"]), j["name"], j["type"])
 
 
-class ColumnAccessor:
+class Accessor:
     id: uuid.UUID
     name: str
     column_ids: list[uuid.UUID]
@@ -196,7 +196,7 @@ class ColumnAccessor:
 
     @staticmethod
     def from_json(j):
-        return ColumnAccessor(
+        return Accessor(
             uuid.UUID(j["id"]),
             j["name"],
             [uuid.UUID(c) for c in j["column_ids"]],
