@@ -2,6 +2,7 @@ import base64
 import sys
 import time
 import uuid
+import urllib.parse
 
 import jwt
 import requests
@@ -42,8 +43,8 @@ class Client:
 
     def __init__(self, url, id, secret):
         self.url = url
-        self.client_id = id
-        self._client_secret = secret
+        self.client_id = urllib.parse.quote(id)
+        self._client_secret = urllib.parse.quote(secret)
 
         self._access_token = self._get_access_token()
 
