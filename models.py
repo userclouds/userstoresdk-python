@@ -273,16 +273,16 @@ class TransformationPolicy:
 
 
 class APIErrorResponse:
-    description: str
+    error: str
     id: uuid.UUID
 
-    def __init__(self, description, id):
-        self.description = description
+    def __init__(self, error, id):
+        self.error = error
         self.id = id
 
     def to_json(self):
-        return ucjson.dumps({"description": self.description, "id": self.id})
+        return ucjson.dumps({"error": self.error, "id": self.id})
 
     @staticmethod
     def from_json(j):
-        return APIErrorResponse(j["description"], j["id"])
+        return APIErrorResponse(j["error"], j["id"])
