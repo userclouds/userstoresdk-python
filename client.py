@@ -1,5 +1,4 @@
 import base64
-import sys
 import time
 import uuid
 import urllib.parse
@@ -11,9 +10,9 @@ from models import (
     AccessPolicy,
     Column,
     Accessor,
+    Mutator,
     UserProfile,
     UserResponse,
-    UserSelector,
     TransformationPolicy,
 )
 from constants import AUTHN_TYPE_PASSWORD
@@ -50,12 +49,8 @@ class Client:
 
     # User Operations
 
-    def CreateUser(
-        self, profile: UserProfile, profile_ext: dict = None, external_alias: str = None
-    ) -> uuid.UUID:
-        body = {"profile": profile.__dict__}
-        if profile_ext is not None:
-            body["profile_ext"] = profile_ext
+    def CreateUser(self, external_alias: str = None) -> uuid.UUID:
+        body = {}
         if external_alias is not None:
             body["external_alias"] = external_alias
 
@@ -237,16 +232,65 @@ class Client:
         return Accessor.from_json(j.get("accessor"))
 
     def ExecuteAccessor(
-        self, user: UserSelector, accessor_id: uuid.UUID, context: dict
+        self, accessor_id: uuid.UUID, context: dict, selector_values: list
     ) -> str:
         body = {
-            "user": user.__dict__,
             "accessor_id": accessor_id,
             "context": context,
+            "selector_values": selector_values,
         }
 
         j = self._post("/userstore/api/accessors", data=ucjson.dumps(body))
         return j.get("value")
+
+    # Mutator Operations
+    def CreateMutator(self, mutator: Mutator) -> Mutator:
+        body = {"mutator": mutator.__dict__}
+
+        j = self._post("/userstore/config/mutators", data=ucjson.dumps(body))
+        return Mutator.from_json(j.get("mutator"))
+
+    def DeleteMutator(self, id: uuid.UUID) -> str:
+        return self._delete(f"/userstore/config/mutators/{str(id)}")
+
+    def GetMutator(self, id: uuid.UUID) -> Mutator:
+        j = self._get(f"/userstore/config/mutators/{str(id)}")
+        return Mutator.from_json(j.get("mutator"))
+
+    def ListMutators(self) -> list[Mutator]:
+        j = self._get("/userstore/config/mutators")
+
+        mutators = []
+        for a in j:
+            mutators.append(Mutator.from_json(a))
+
+        return mutators
+
+    def UpdateMutator(self, mutator: Mutator) -> Mutator:
+        body = {"mutator": mutator.__dict__}
+
+        j = self._put(
+            f"/userstore/config/mutators/{mutator.id}",
+            data=ucjson.dumps(body),
+        )
+        return Mutator.from_json(j.get("mutator"))
+
+    def ExecuteMutator(
+        self,
+        mutator_id: uuid.UUID,
+        context: dict,
+        selector_values: list,
+        row_values: dict,
+    ) -> str:
+        body = {
+            "mutator_id": mutator_id,
+            "context": context,
+            "selector_values": selector_values,
+            "row_values": row_values,
+        }
+
+        j = self._post("/userstore/api/mutators", data=ucjson.dumps(body))
+        return j
 
     # Access token helpers
 

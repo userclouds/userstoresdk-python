@@ -133,20 +133,18 @@ class UserResponse:
         )
 
 
-class UserSelector:
-    id: uuid.UUID
-    external_alias: str
+class UserSelectorConfig:
+    where_clause: str
 
-    def __init__(self, id, external_alias):
-        self.id = id
-        self.external_alias = external_alias
+    def __init__(self, where_clause):
+        self.where_clause = where_clause
 
     def to_json(self):
-        return ucjson.dumps({"id": str(self.id), "external_alias": self.external_alias})
+        return ucjson.dumps({"where_clause": self.where_clause})
 
     @staticmethod
     def from_json(j):
-        return UserSelector(uuid.UUID(j["id"]), j["external_alias"])
+        return UserSelectorConfig(j["where_clause"])
 
 
 class Column:
@@ -170,27 +168,44 @@ class Column:
 class Accessor:
     id: uuid.UUID
     name: str
+    description: str
     column_ids: list[uuid.UUID]
     access_policy_id: uuid.UUID
     transformation_policy_id: uuid.UUID
+    selector_config: UserSelectorConfig
+    version: int
 
     def __init__(
-        self, id, name, column_ids, access_policy_id, transformation_policy_id
+        self,
+        id,
+        name,
+        description,
+        column_ids,
+        access_policy_id,
+        transformation_policy_id,
+        selector_config,
+        version=0,
     ):
         self.id = id
         self.name = name
+        self.description = description
         self.column_ids = column_ids
         self.access_policy_id = access_policy_id
         self.transformation_policy_id = transformation_policy_id
+        self.selector_config = selector_config
+        self.version = version
 
     def to_json(self):
         return ucjson.dumps(
             {
                 "id": str(self.id),
                 "name": self.name,
+                "description": self.description,
+                "version": self.version,
                 "column_ids": [str(c) for c in self.column_ids],
                 "access_policy_id": str(self.access_policy_id),
                 "transformation_policy_id": str(self.transformation_policy_id),
+                "selector_config": self.selector_config.to_json(),
             }
         )
 
@@ -199,9 +214,70 @@ class Accessor:
         return Accessor(
             uuid.UUID(j["id"]),
             j["name"],
+            j["description"],
             [uuid.UUID(c) for c in j["column_ids"]],
             uuid.UUID(j["access_policy_id"]),
             uuid.UUID(j["transformation_policy_id"]),
+            UserSelectorConfig.from_json(j["selector_config"]),
+            j["version"],
+        )
+
+
+class Mutator:
+    id: uuid.UUID
+    name: str
+    description: str
+    column_ids: list[uuid.UUID]
+    access_policy_id: uuid.UUID
+    validation_policy_id: uuid.UUID
+    selector_config: UserSelectorConfig
+    version: int
+
+    def __init__(
+        self,
+        id,
+        name,
+        description,
+        column_ids,
+        access_policy_id,
+        validation_policy_id,
+        selector_config,
+        version=0,
+    ):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.column_ids = column_ids
+        self.access_policy_id = access_policy_id
+        self.validation_policy_id = validation_policy_id
+        self.selector_config = selector_config
+        self.version = version
+
+    def to_json(self):
+        return ucjson.dumps(
+            {
+                "id": str(self.id),
+                "name": self.name,
+                "description": self.description,
+                "version": self.version,
+                "column_ids": [str(c) for c in self.column_ids],
+                "access_policy_id": str(self.access_policy_id),
+                "validation_policy_id": str(self.validation_policy_id),
+                "selector_config": self.selector_config.to_json(),
+            }
+        )
+
+    @staticmethod
+    def from_json(j):
+        return Mutator(
+            uuid.UUID(j["id"]),
+            j["name"],
+            j["description"],
+            [uuid.UUID(c) for c in j["column_ids"]],
+            uuid.UUID(j["access_policy_id"]),
+            uuid.UUID(j["validation_policy_id"]),
+            UserSelectorConfig.from_json(j["selector_config"]),
+            j["version"],
         )
 
 
@@ -268,6 +344,38 @@ class TransformationPolicy:
     @staticmethod
     def from_json(j):
         return TransformationPolicy(
+            uuid.UUID(j["id"]), j["name"], j["function"], j["parameters"]
+        )
+
+
+class ValidationPolicy:
+    id: uuid.UUID
+    name: str
+    function: str
+    parameters: str
+
+    def __init__(self, id, name="", function="", parameters=""):
+        self.id = id
+        self.name = name
+        self.function = function
+        self.parameters = parameters
+
+    def __repr__(self):
+        return f"ValidationPolicy({self.id})"
+
+    def to_json(self):
+        return ucjson.dumps(
+            {
+                "id": str(self.id),
+                "name": self.name,
+                "function": self.function,
+                "parameters": self.parameters,
+            },
+        )
+
+    @staticmethod
+    def from_json(j):
+        return ValidationPolicy(
             uuid.UUID(j["id"]), j["name"], j["function"], j["parameters"]
         )
 
