@@ -169,7 +169,7 @@ class Accessor:
     id: uuid.UUID
     name: str
     description: str
-    column_ids: list[uuid.UUID]
+    column_names: list[str]
     access_policy_id: uuid.UUID
     transformation_policy_id: uuid.UUID
     selector_config: UserSelectorConfig
@@ -180,7 +180,7 @@ class Accessor:
         id,
         name,
         description,
-        column_ids,
+        column_names,
         access_policy_id,
         transformation_policy_id,
         selector_config,
@@ -189,7 +189,7 @@ class Accessor:
         self.id = id
         self.name = name
         self.description = description
-        self.column_ids = column_ids
+        self.column_names = column_names
         self.access_policy_id = access_policy_id
         self.transformation_policy_id = transformation_policy_id
         self.selector_config = selector_config
@@ -202,7 +202,7 @@ class Accessor:
                 "name": self.name,
                 "description": self.description,
                 "version": self.version,
-                "column_ids": [str(c) for c in self.column_ids],
+                "column_names": self.column_names,
                 "access_policy_id": str(self.access_policy_id),
                 "transformation_policy_id": str(self.transformation_policy_id),
                 "selector_config": self.selector_config.to_json(),
@@ -215,7 +215,7 @@ class Accessor:
             uuid.UUID(j["id"]),
             j["name"],
             j["description"],
-            [uuid.UUID(c) for c in j["column_ids"]],
+            j["column_names"],
             uuid.UUID(j["access_policy_id"]),
             uuid.UUID(j["transformation_policy_id"]),
             UserSelectorConfig.from_json(j["selector_config"]),
@@ -227,7 +227,7 @@ class Mutator:
     id: uuid.UUID
     name: str
     description: str
-    column_ids: list[uuid.UUID]
+    column_names: list[str]
     access_policy_id: uuid.UUID
     validation_policy_id: uuid.UUID
     selector_config: UserSelectorConfig
@@ -238,7 +238,7 @@ class Mutator:
         id,
         name,
         description,
-        column_ids,
+        column_names,
         access_policy_id,
         validation_policy_id,
         selector_config,
@@ -247,7 +247,7 @@ class Mutator:
         self.id = id
         self.name = name
         self.description = description
-        self.column_ids = column_ids
+        self.column_names = column_names
         self.access_policy_id = access_policy_id
         self.validation_policy_id = validation_policy_id
         self.selector_config = selector_config
@@ -260,7 +260,7 @@ class Mutator:
                 "name": self.name,
                 "description": self.description,
                 "version": self.version,
-                "column_ids": [str(c) for c in self.column_ids],
+                "column_names": self.column_names,
                 "access_policy_id": str(self.access_policy_id),
                 "validation_policy_id": str(self.validation_policy_id),
                 "selector_config": self.selector_config.to_json(),
@@ -273,7 +273,7 @@ class Mutator:
             uuid.UUID(j["id"]),
             j["name"],
             j["description"],
-            [uuid.UUID(c) for c in j["column_ids"]],
+            j["column_names"],
             uuid.UUID(j["access_policy_id"]),
             uuid.UUID(j["validation_policy_id"]),
             UserSelectorConfig.from_json(j["selector_config"]),

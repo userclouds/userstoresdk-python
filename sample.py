@@ -36,12 +36,11 @@ def example():
     c = Client(url, client_id, client_secret)
 
     # create phone number and home address columns
-    names = ["Phone Number", "Home Address"]
+    colNames = ["Phone Number", "Home Address"]
     colIds = []
-    for name in names:
+    for name in colNames:
         try:
             col = c.CreateColumn(Column(None, name, COLUMN_TYPE_STRING))
-            colId = col.id
             colIds.append(col.id)
         except Error as e:
             colIds.append(recoverIDFrom409Error(e))
@@ -111,7 +110,7 @@ function policy(data, params) {
             uuid.uuid4(),
             "PIIAccessorForSupport",
             "Accessor for support team",
-            colIds,
+            colNames,
             ap_id,
             tp_support_id,
             UserSelectorConfig(
@@ -128,7 +127,7 @@ function policy(data, params) {
             uuid.uuid4(),
             "PIIAccessorForSecurity",
             "Accessor for security team",
-            colIds,
+            colNames,
             ap_id,
             tp_security_id,
             UserSelectorConfig(
@@ -147,7 +146,7 @@ function policy(data, params) {
             uuid.uuid4(),
             "Mutator",
             "General mutator",
-            colIds,
+            colNames,
             ACCESS_POLICY_OPEN_ID,
             VALIDATION_POLICY_PASS_THROUGH_ID,
             UserSelectorConfig(
